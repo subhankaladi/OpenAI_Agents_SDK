@@ -1,8 +1,8 @@
-import nest_asyncio
 import os
-from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
-from agents.run import RunConfig
-nest_asyncio.apply()
+from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel, RunConfig
+from dotenv import load_dotenv
+
+load_dotenv()
 
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
