@@ -48,7 +48,7 @@ Follow these steps to dive into the OpenAI Agents SDK:
 
 ## 🎥 YouTube Content
 
-I’m actively sharing tutorials and walkthroughs on my [YouTube channel](https://www.youtube.com/your-channel-link). Subscribe to stay updated on:
+I’m actively sharing tutorials and walkthroughs on my [YouTube channel](https://www.youtube.com/@subhankaladi). Subscribe to stay updated on:
 - SDK feature deep dives
 - Live coding sessions
 - Tips and tricks for optimizing your agents
