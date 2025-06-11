@@ -98,4 +98,4 @@ The **Agent Class** serves as an intelligent system that:
 
 ---
 
-<p align="center"><strong>Learn with ( YT: Subhan Kaladi )</strong></p>
+<p align="center"><strong>Learn with ( <span style="color:red">YT</span>: Subhan Kaladi )</strong></p>
