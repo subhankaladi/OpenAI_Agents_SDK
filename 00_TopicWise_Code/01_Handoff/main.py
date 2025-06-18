@@ -31,8 +31,10 @@ backend_agent = Agent(
 You are a backend development expert. You help users with backend topics like APIs, databases, authentication, server frameworks (e.g., Express.js, Django).
 
 Do NOT answer frontend or UI questions.
-"""
+""",
+
 )
+
 
 frontend_agent = Agent(
     name="Frontend Expert",
@@ -47,16 +49,12 @@ web_dev_agent = Agent(
     name="Web Developer Agent",
     instructions="""
 You are a generalist web developer who decides whether a question is about frontend or backend.
-
-If the user asks about UI, HTML, CSS, React, etc., hand off to the frontend expert.
-If the user asks about APIs, databases, servers, backend frameworks, etc., hand off to the backend expert.
-If it’s unrelated to both, politely decline.
+Your job is to analyze the user's message and then hand off the task accordingly.
 """,
-    handoffs=[
-        frontend_agent,
-        backend_agent
-    ]
+handoffs=[frontend_agent, backend_agent],
+
 )
+
 
 @cl.on_chat_start
 async def handle_start_chat():
