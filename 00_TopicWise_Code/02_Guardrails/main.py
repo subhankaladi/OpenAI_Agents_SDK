@@ -39,30 +39,30 @@ async def input_climate_guardrail(
         tripwire_triggered=not result.final_output.is_climate_related
     )
 
-# # ========== Output Guardrail ==========
-# output_guardrail_agent = Agent(
-#     name="OutputClimateGuard",
-#     instructions="Verify if the generated content is about climate change. Return true only for climate topics.",
-#     output_type=ClimateCheck,
-#     model=OpenAIChatCompletionsModel(
-#         model="gemini-2.0-flash",
-#         openai_client=AsyncOpenAI(
-#             api_key=os.getenv("GEMINI_API_KEY"),
-#             base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-#         )
-#     )
-# )
+# ========== Output Guardrail ==========
+output_guardrail_agent = Agent(
+    name="OutputClimateGuard",
+    instructions="Verify if the generated content is about climate change. Return true only for climate topics.",
+    output_type=ClimateCheck,
+    model=OpenAIChatCompletionsModel(
+        model="gemini-2.0-flash",
+        openai_client=AsyncOpenAI(
+            api_key=os.getenv("GEMINI_API_KEY"),
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+        )
+    )
+)
 
-# @output_guardrail
-# async def output_climate_guardrail(
-#     ctx: RunContextWrapper, agent: Agent, output: str
-# ) -> GuardrailFunctionOutput:
-#     result = await Runner.run(output_guardrail_agent, output)
+@output_guardrail
+async def output_climate_guardrail(
+    ctx: RunContextWrapper, agent: Agent, output: str
+) -> GuardrailFunctionOutput:
+    result = await Runner.run(output_guardrail_agent, output)
     
-#     return GuardrailFunctionOutput(
-#         output_info=result.final_output,
-#         tripwire_triggered=not result.final_output.is_climate_related
-#     )
+    return GuardrailFunctionOutput(
+        output_info=result.final_output,
+        tripwire_triggered=not result.final_output.is_climate_related
+    )
 
 # ========== Model Setup ==========
 gemini_api_key = os.getenv("GEMINI_API_KEY")
