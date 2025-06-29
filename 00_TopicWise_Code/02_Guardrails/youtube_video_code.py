@@ -45,13 +45,39 @@ async def python_guardrail(
     )
 
 
+class MessageOutput(BaseModel): 
+    response: str
+
+class PythonOutput(BaseModel): 
+    reasoning: str
+    is_python: bool
+
+output_guardrail_agent = Agent(
+    name="Guardrail check",
+    instructions="Check if the output includes any python related response.",
+    output_type=PythonOutput,
+)
+
+@output_guardrail
+async def output_python_guardrail(  
+    ctx: RunContextWrapper, agent: Agent, output: MessageOutput
+) -> GuardrailFunctionOutput:
+    result = await Runner.run(input_guardrail_agent, output.response)
+
+    return GuardrailFunctionOutput(
+        output_info=result.final_output,
+        tripwire_triggered=result.final_output.is_python,
+    )
+
+
+
 # 🧠 Main Python Expert Agent
 one_agent = Agent(
     name="PythonExpert",
     instructions="You are a Python expert. Only respond to Python programming questions.",
     model=model,
     input_guardrails=[python_guardrail],
-    # output_guardrails=[output_python_guardrail]
+    output_guardrails=[output_python_guardrail]
 )
 
 
