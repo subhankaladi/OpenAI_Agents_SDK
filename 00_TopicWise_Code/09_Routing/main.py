@@ -1,5 +1,3 @@
-
-
 from agents import Runner, Agent, AsyncOpenAI, OpenAIChatCompletionsModel, RunConfig , handoff
 from dotenv import load_dotenv
 import os
@@ -32,15 +30,7 @@ You are a backend development expert. You help users with backend topics like AP
 
 Do NOT answer frontend or UI questions.
 """,
-
 )
-
-
-# backend_handoff = handoff(
-#     input_filter=backend_agent,
-#     on_handoff=backend_agent
-    
-# )
 
 frontend_agent = Agent(
     name="Frontend Expert",
@@ -60,7 +50,6 @@ Your job is to analyze the user's message and then hand off the task accordingly
 handoffs=[frontend_agent, backend_agent],
 
 )
-
 
 @cl.on_chat_start
 async def handle_start_chat():
