@@ -1,18 +1,16 @@
 from dataclasses import dataclass
 from agents import Agent, Runner, RunContextWrapper, function_tool, OpenAIChatCompletionsModel
 from openai import AsyncOpenAI
+from dotenv import load_dotenv()
 
+load_dotenv()
 
-
-gemini_api_key="AIzaSyAxgcwDGiNJp_ImY9z2XGv88Eg5C1f2y_w"
-
+gemini_api_key= os.getenv("GEMINI_API_KEY")
 
 client = AsyncOpenAI(
     api_key=gemini_api_key,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
-
-
 
 model = OpenAIChatCompletionsModel(
     model="gemini-2.0-flash",

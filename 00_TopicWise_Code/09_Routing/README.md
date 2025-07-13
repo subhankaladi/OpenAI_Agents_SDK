@@ -46,7 +46,7 @@ Helps with:
 ### 3. **Web Developer Agent** (Router)
 - Acts like a router.
 - Analyzes user's input.
-- Forwards (or **hands off**) the question to the relevant expert agent.
+- Forwards (or **handsoff**) the question to the relevant expert agent.
 
 ---
 

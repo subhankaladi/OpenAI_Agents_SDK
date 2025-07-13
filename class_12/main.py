@@ -1,3 +1,4 @@
+import openai
 def main():
     print("Hello from class-12!")
 
