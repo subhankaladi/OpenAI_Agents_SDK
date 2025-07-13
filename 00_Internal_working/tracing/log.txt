@@ -1,0 +1,6 @@
+[EXPORT] TraceImpl -> UnknownSpan
+[EXPORT] SpanImpl -> GenerationSpan (gemini-2.0-flash)
+[EXPORT] SpanImpl -> HandoffSpanData
+[EXPORT] SpanImpl -> Assistant
+[EXPORT] SpanImpl -> GenerationSpan (gemini-2.0-flash)
+[EXPORT] SpanImpl -> Python Expert
