@@ -1,0 +1,10 @@
+[project]
+name = "tracing-practically"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langsmith[openai-agents]>=0.3.14",
+    "openai-agents>=0.1.0",
+]
