@@ -88,6 +88,10 @@ It doesn’t know you personally or your mug — it’s just using its training 
 
 ---
 
+![LLM Diagram](LLM.png)
+
+---
+
 ## Key Model Settings
 
 ### Temperature (0–1)
