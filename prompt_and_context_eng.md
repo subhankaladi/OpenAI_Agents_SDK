@@ -210,9 +210,8 @@ Break problems into steps. Prompt: "Think step by step."
 **When**: Logic tasks, like math. Skip simple questions.
 
 **Use Case**:
-- Problem: Bat + ball = $1.10; bat = ball + $1. Ball cost?
+- Problem: I want to make a biryani give me the recipe, let's do with step by step
 - Prompt: "...Think step by step."
-- Answer: Ball = 5¢ (via equations).
 
 ### Tree of Thoughts (ToT)
 
@@ -227,15 +226,8 @@ Like CoT with branches. Explore multiple paths, pick best.
 **When**: Creative/open tasks, like planning. Skip facts.
 
 **Use Case**:
-- Problem: NY to LA trip, <$500.
-- Prompt: "Generate 3 routes. Evaluate pros/cons. Expand best."
-- Answer: Best = Flight to Chicago ($200) + bus ($250). Total: $450.
+Problem: give me 3 sales strategies for shirt marketing, with ToT (tree of thoughts)
 
-### Concepts Explained
-
-CoT/ToT fix AI's weak reasoning. CoT: Linear steps (2022). ToT: Branching tree with evaluation (2023). Like human brainstorming.
-
-Start with CoT; try ToT for tough stuff.
 
 ### Comparison
 
