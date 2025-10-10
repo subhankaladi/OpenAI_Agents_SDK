@@ -226,7 +226,7 @@ Like CoT with branches. Explore multiple paths, pick best.
 **When**: Creative/open tasks, like planning. Skip facts.
 
 **Use Case**:
-Problem: give me 3 sales strategies for shirt marketing, with ToT (tree of thoughts)
+Problem: give me sales strategies for shirt marketing, with ToT (tree of thoughts)
 
 
 ### Comparison
