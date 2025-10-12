@@ -193,7 +193,7 @@ It’s useful when the task needs **clear context or consistent formatting**.
 
 ### Master CoT (Chain of Thoughts) & ToT (Tree of Thoughts) Prompting
 
-Beginner-friendly intro to **Chain of Thought (CoT)** and **Tree of Thoughts (ToT)**—prompting tricks to make AI think better. Like step-by-step guides for AI brains.
+Beginner-friendly intro to **Chain of Thought (CoT)** and **Tree of Thoughts (ToT)** prompting tricks to make AI think better. Like step-by-step guides for AI brains.
 
 Covers: Explanations, benefits, when to use, use cases, concepts.
 
@@ -223,7 +223,7 @@ Like CoT with branches. Explore multiple paths, pick best.
 - 70% better on complex puzzles.
 - Boosts creativity; self-corrects.
 
-**When**: Creative/open tasks, like planning. Skip facts.
+**When**: Creative/open tasks, like planning. Skip facts questions.
 
 **Use Case**:
 Problem: give me sales strategies for shirt marketing, with ToT (tree of thoughts)
