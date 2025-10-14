@@ -26,9 +26,9 @@ def file_and_folder_handler(
             if os.path.exists(file_path):
                 with open(file_path, "r") as f:
                     file_data = f.read()
-                return f"content of {file_path} is {file_data}"
+                result_messages.append(f"content of {file_path} is {file_data}")
             else :
-                return f"File {file_path} does not exist"
+                result_messages.append(f"File {file_path} does not exist")
         if file_name:
             if folder_name:
                 full_path = os.path.join(folder_name, file_name)
