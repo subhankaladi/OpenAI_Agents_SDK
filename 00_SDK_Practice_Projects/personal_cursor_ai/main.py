@@ -6,7 +6,7 @@ from openai import AsyncOpenAI
 from agents import OpenAIChatCompletionsModel
 import chainlit as cl
 
-GEMINI_API_KEY = "AIzaSyBzr7kR3PCkWGDUZxSm6M8XNqfwTfAU8Gg"
+GEMINI_API_KEY = "your-api-key"
 
 load_dotenv()
 
