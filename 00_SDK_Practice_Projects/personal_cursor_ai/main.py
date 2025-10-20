@@ -1,74 +1,123 @@
-from agents import Agent, Runner, function_tool, enable_verbose_stdout_logging
+from agents import Agent, Runner, function_tool
 from dotenv import load_dotenv
 import os
+import shutil
+from openai import AsyncOpenAI
+from agents import OpenAIChatCompletionsModel
+import chainlit as cl
+
+GEMINI_API_KEY = "AIzaSyBzr7kR3PCkWGDUZxSm6M8XNqfwTfAU8Gg"
 
 load_dotenv()
-# enable_verbose_stdout_logging()
 
+client = AsyncOpenAI(
+    api_key=GEMINI_API_KEY,
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
+
+model = OpenAIChatCompletionsModel(
+    openai_client=client,
+    model="gemini-2.5-flash"
+)
 
 @function_tool(strict_mode=False)
 def file_and_folder_handler(
-    file_name : str = None,
+    file_name: str = None,
     folder_name: str = None,
-    content : str = None,
-    file_path : str = None,
-    read : bool = None
+    content: str = None,
+    file_path: str = None,
+    read: bool = None,
+    delete: bool = None
 ):
+
     try:
         result_messages = []
 
-        # Create folder 
-        if folder_name:
-            os.makedirs(folder_name, exist_ok=True)
-            result_messages.append(f"Folder '{folder_name}' is ready")
+        # ✅ Auto-detect path if only file_name is given
+        if not file_path and file_name:
+            file_path = os.path.join(folder_name, file_name) if folder_name else file_name
 
+        # ✅ Create folder (if requested)
+        if folder_name and not delete and not read:
+            os.makedirs(folder_name, exist_ok=True)
+            result_messages.append(f"📁 Folder '{folder_name}' is ready")
+
+        # ✅ Delete file or folder
+        if delete:
+            if file_path and os.path.exists(file_path):
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    result_messages.append(f"🗑️ File '{file_path}' deleted successfully")
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+                    result_messages.append(f"🗑️ Folder '{file_path}' deleted successfully")
+            else:
+                result_messages.append(f"⚠️ Path '{file_path}' does not exist or not provided for deletion")
+
+        # ✅ Read file (only read, no overwrite)
         if read and file_path:
             if os.path.exists(file_path):
-                with open(file_path, "r") as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     file_data = f.read()
-                result_messages.append(f"content of {file_path} is {file_data}")
-            else :
-                result_messages.append(f"File {file_path} does not exist")
-        if file_name:
+                result_messages.append(f"📖 Content of '{file_path}':\n{file_data}")
+                return "\n".join(result_messages)
+            else:
+                result_messages.append(f"⚠️ File '{file_path}' does not exist")
+                return "\n".join(result_messages)
+
+        # ✅ Create or write to file (only if not in read/delete mode)
+        if file_name and not delete and not read:
             if folder_name:
                 full_path = os.path.join(folder_name, file_name)
             else:
                 full_path = file_name
-            
-            with open(full_path, "w") as f:
+
+            with open(full_path, "w", encoding="utf-8") as f:
                 f.write(content if content else "")
 
-            result_messages.append(f"File '{full_path}' is created successfully")
+            result_messages.append(f"📝 File '{full_path}' created successfully")
             if content:
-                result_messages.append(f"Content written to '{full_path}'")
-        return "\n".join(result_messages)
+                result_messages.append(f"✏️ Content written to '{full_path}'")
+
+        return "\n".join(result_messages) if result_messages else "No action performed."
 
     except Exception as e:
-        print(f"Error occurred: {e}")
+        return f"❌ Error occurred: {e}"
+
+
+
 
 file_handler_agent = Agent(
     name="FileHandlerAgent",
-    instructions="""you are helpfull file management assistant.You can:
-    1. Create folders and files
-    2. Write content to files
-    3. Read content from files
-    4. You should use the tool to perform file and folder operations
-    5. Generate HTML, CSS JS code snippets when required
+    instructions="""You are a helpful file management assistant. You can:
+    1. Create folders and files.
+    2. Write or update file content.
+    3. Read content from files.
+    4. Delete specific files or folders when asked.
+    5. Use the file_and_folder_handler tool to perform all operations.
+    6. Generate HTML, CSS, or JS code snippets when needed.
     
-    Examples of what you can do:
-    - Create a folder named 'my_folder'
-    - Inside 'my_folder', create a file named e.g 'index.html' and write a basic
-      html boilerplate code in it
-    - Read the content of 'my_folder/index.html'
-    - Create a file named 'styles.css' and write css code to make the background color""",
-    tools=[file_and_folder_handler]
+    Example commands:
+    - "Create a folder named 'my_project'"
+    - "Inside 'my_project', create a file 'index.html' with a basic HTML template"
+    - "Read the content of 'my_project/index.html'"
+    - "Delete the file 'my_project/index.html'"
+    - "Remove the folder 'my_project'"
+    """,
+    tools=[file_and_folder_handler],
+    model=model
 )
 
-result = Runner.run_sync(
-    starting_agent=file_handler_agent,
-    input="create three file html css and js in folder named full_stack"
 
-)
+@cl.on_chat_start
+async def on_chat_start():
+    await cl.Message(content="Hello file manager here").send()
 
-print(result.final_output)
 
+@cl.on_message
+async def on_message(message : cl.Message):
+    result = await Runner.run(
+        starting_agent=file_handler_agent,
+        input=message.content
+    )
+    await cl.Message(content=result.final_output).send()
