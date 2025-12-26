@@ -1,0 +1,12 @@
+[project]
+name = "trace-processor"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.116.1",
+    "openai-agents==0.2.11",
+    "python-dotenv>=1.1.1",
+    "uvicorn>=0.35.0",
+]

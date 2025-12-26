@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top-K Sampling Distribution</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        thead th {
+            padding: 25px 20px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.4em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(135deg, #ffe0e6, #ffcccb);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        td {
+            padding: 20px 15px;
+            text-align: center;
+            font-size: 1.3em;
+            border-bottom: 1px solid #ecf0f1;
+            font-weight: 700;
+        }
+
+        .rank-cell {
+            font-weight: 800;
+            color: #2c3e50;
+            text-align: center;
+            position: relative;
+            font-size: 1.4em;
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            border-radius: 8px;
+        }
+
+        .token-cell {
+            font-weight: 800;
+            color: #2c3e50;
+            text-align: left;
+            position: relative;
+            font-size: 1.4em;
+        }
+
+        .token-cell::before {
+            content: '🎯';
+            margin-right: 8px;
+            color: #ff6b6b;
+        }
+
+        .prob-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: 800;
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 8px;
+            font-size: 1.5em;
+        }
+
+        .k-value-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: 800;
+            color: #8e44ad;
+            background: rgba(142, 68, 173, 0.1);
+            border-radius: 8px;
+            font-size: 1.5em;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+            border-radius: 4px;
+            margin-top: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .print-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .k-info {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .container {
+                background: white;
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .print-btn {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            table {
+                font-size: 0.9em;
+            }
+            
+            td, th {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Top-K Sampling Distribution</h1>
+            <p class="subtitle">Token Selection Based on K-Value By Subhan Kaladi</p>
+        </div>
+
+        <div class="k-info">
+            📊 Top-K restricts token selection to the K most probable candidates at each step
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Token</th>
+                        <th>Probability (p)</th>
+                        <th>K-Value Selected</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank-cell">1</td>
+                        <td class="token-cell">sun</td>
+                        <td class="prob-cell">0.18</td>
+                        <td class="k-value-cell">K=1 ✓<div class="progress-bar" style="width: 100%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">2</td>
+                        <td class="token-cell">star</td>
+                        <td class="prob-cell">0.14</td>
+                        <td class="k-value-cell">K=2 ✓<div class="progress-bar" style="width: 87%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">3</td>
+                        <td class="token-cell">plasma</td>
+                        <td class="prob-cell">0.11</td>
+                        <td class="k-value-cell">K=3 ✓<div class="progress-bar" style="width: 74%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">4</td>
+                        <td class="token-cell">fusion</td>
+                        <td class="prob-cell">0.09</td>
+                        <td class="k-value-cell">K=4 ✓<div class="progress-bar" style="width: 61%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">5</td>
+                        <td class="token-cell">hydrogen</td>
+                        <td class="prob-cell">0.08</td>
+                        <td class="k-value-cell">K=5 ✓<div class="progress-bar" style="width: 50%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">6</td>
+                        <td class="token-cell">helium</td>
+                        <td class="prob-cell">0.07</td>
+                        <td class="k-value-cell">K=6 ✓<div class="progress-bar" style="width: 44%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">7</td>
+                        <td class="token-cell">photosphere</td>
+                        <td class="prob-cell">0.05</td>
+                        <td class="k-value-cell">K=7 ✓<div class="progress-bar" style="width: 39%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">8</td>
+                        <td class="token-cell">corona</td>
+                        <td class="prob-cell">0.05</td>
+                        <td class="k-value-cell">K=8 ✓<div class="progress-bar" style="width: 35%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">9</td>
+                        <td class="token-cell">light</td>
+                        <td class="prob-cell">0.04</td>
+                        <td class="k-value-cell">K=9 ✓<div class="progress-bar" style="width: 31%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">10</td>
+                        <td class="token-cell">heat</td>
+                        <td class="prob-cell">0.04</td>
+                        <td class="k-value-cell">K=10 ✓<div class="progress-bar" style="width: 28%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">11</td>
+                        <td class="token-cell">radiation</td>
+                        <td class="prob-cell">0.03</td>
+                        <td class="k-value-cell">K=11 ✓<div class="progress-bar" style="width: 25%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">12</td>
+                        <td class="token-cell">sunspots</td>
+                        <td class="prob-cell">0.03</td>
+                        <td class="k-value-cell">K=12 ✓<div class="progress-bar" style="width: 22%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">13</td>
+                        <td class="token-cell">magnetic</td>
+                        <td class="prob-cell">0.03</td>
+                        <td class="k-value-cell">K=13 ✓<div class="progress-bar" style="width: 20%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">14</td>
+                        <td class="token-cell">solar-wind</td>
+                        <td class="prob-cell">0.02</td>
+                        <td class="k-value-cell">K=14 ✓<div class="progress-bar" style="width: 17%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">15</td>
+                        <td class="token-cell">luminosity</td>
+                        <td class="prob-cell">0.01</td>
+                        <td class="k-value-cell">K=15 ✓<div class="progress-bar" style="width: 14%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">16</td>
+                        <td class="token-cell">flare</td>
+                        <td class="prob-cell">0.01</td>
+                        <td class="k-value-cell">K=16 ✓<div class="progress-bar" style="width: 12%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">17</td>
+                        <td class="token-cell">protuberance</td>
+                        <td class="prob-cell">0.005</td>
+                        <td class="k-value-cell">K=17 ✓<div class="progress-bar" style="width: 9%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">18</td>
+                        <td class="token-cell">granulation</td>
+                        <td class="prob-cell">0.005</td>
+                        <td class="k-value-cell">K=18 ✓<div class="progress-bar" style="width: 7%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">19</td>
+                        <td class="token-cell">nuclear</td>
+                        <td class="prob-cell">0.005</td>
+                        <td class="k-value-cell">K=19 ✓<div class="progress-bar" style="width: 5%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">20</td>
+                        <td class="token-cell">heliosphere</td>
+                        <td class="prob-cell">0.003</td>
+                        <td class="k-value-cell">K=20 ✓<div class="progress-bar" style="width: 3%"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="rank-cell">21</td>
+                        <td class="token-cell">eclipse</td>
+                        <td class="prob-cell">0.002</td>
+                        <td class="k-value-cell">K=21 ✓<div class="progress-bar" style="width: 1%"></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">📄 Print / Save as PDF</button>
+
+        <div class="footer">
+            <p>Generated on: <span id="date"></span></p>
+            <p><strong>Top-K Sampling:</strong> Restricts selection to K highest probability tokens</p>
+            <p>Example: K=5 means only top 5 tokens (sun, star, plasma, fusion, hydrogen) are considered</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('date').textContent = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Add animation on load
+        window.addEventListener('load', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    row.style.transition = 'all 0.5s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        });
+    </script>
+</body>
+</html>
