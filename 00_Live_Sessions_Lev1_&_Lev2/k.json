@@ -1,0 +1,29 @@
+
+
+
+[
+  {
+    "name": "get_weather",
+    "parameters": {
+      "properties": {
+        "city": {
+          "title": "City",
+          "type": "string"
+        },
+        "condition": {
+          "default": "mist",
+          "title": "Condition",
+          "type": "string"
+        }
+      },
+      "required": [
+        "city"
+      ],
+      "title": "get_weather_args",
+      "type": "object"
+    },
+    "strict": false,
+    "type": "function",
+    "description": "Get the weather for a given city"
+  }
+]
