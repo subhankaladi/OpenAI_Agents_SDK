@@ -67,7 +67,7 @@ Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
 
 - Check the `issues/` folder for solutions to common problems.
 - Open a new issue on this repo if you encounter a bug or have a question.
-- Reach out to me on [YouTube](https://www.youtube.com/your-channel-link)
+- Reach out to me on [YouTube](https://www.youtube.com/@subhankaladi)
 
 ## 🌈 Why This Repo?
 
